@@ -1,4 +1,4 @@
-package com.spring.accesshub;
+package com.access.hub;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
