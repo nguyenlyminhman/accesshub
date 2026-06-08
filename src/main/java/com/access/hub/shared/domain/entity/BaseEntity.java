@@ -27,6 +27,9 @@ public class BaseEntity {
     @Column(name = "updated_by")
     private String updatedBy;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     public void markAsCreated(String userId) {
         this.createdAt = LocalDateTime.now();
         this.createdBy = userId;
@@ -34,6 +37,11 @@ public class BaseEntity {
 
     public void markAsUpdated(String userId) {
         this.updatedAt = LocalDateTime.now();
+        this.updatedBy = userId;
+    }
+
+    public void markAsDeleted(String userId) {
+        this.deletedAt = LocalDateTime.now();
         this.updatedBy = userId;
     }
 }
