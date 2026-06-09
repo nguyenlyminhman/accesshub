@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/organization/user")
-@Tag(name = "Organization Context")
+@Tag(name = "Organization Context", description = "Quản lý phòng ban và nhân sự")
 public class UserController {
     private final CreateUserUseCase createUserUseCase;
 
