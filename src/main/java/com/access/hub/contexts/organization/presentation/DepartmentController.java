@@ -5,13 +5,15 @@ import com.access.hub.contexts.organization.application.usecase.CreateDepartment
 import com.access.hub.contexts.organization.domain.entity.Department;
 import com.access.hub.contexts.project.domain.entity.Project;
 import com.access.hub.shared.application.dto.ResponseObject;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/department")
+@RequestMapping("/api/v1/organization/department")
+@Tag(name = "Organization Context", description = "Quản lý phòng ban và nhân sự")
 public class DepartmentController {
 
     private final CreateDepartmentUseCase createDepartmentUseCase;
@@ -20,7 +22,7 @@ public class DepartmentController {
         this.createDepartmentUseCase = createDepartmentUseCase;
     }
 
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseObject createDepartment(@RequestBody CreateDepartmentDto request) {
         ResponseObject responseObject = new ResponseObject();
 

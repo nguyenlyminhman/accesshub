@@ -4,13 +4,15 @@ import com.access.hub.contexts.project.application.dto.CreateProjectDto;
 import com.access.hub.contexts.project.application.usecase.CreateProjectUseCase;
 import com.access.hub.contexts.project.domain.entity.Project;
 import com.access.hub.shared.application.dto.ResponseObject;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/projects")
+@RequestMapping("/api/v1/project")
+@Tag(name = "Project Context", description = "Quản lý dự án và phân bổ tài nguyên")
 public class ProjectController {
 
     private final CreateProjectUseCase createProjectUseCase;
@@ -19,7 +21,7 @@ public class ProjectController {
         this.createProjectUseCase = createProjectUseCase;
     }
 
-    @PostMapping
+    @PostMapping()
     public ResponseObject createProject(@RequestBody CreateProjectDto request) {
         ResponseObject responseObject = new ResponseObject();
 

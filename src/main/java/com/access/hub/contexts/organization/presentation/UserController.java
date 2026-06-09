@@ -5,13 +5,15 @@ import com.access.hub.contexts.organization.application.usecase.CreateUserUseCas
 import com.access.hub.contexts.organization.domain.entity.Department;
 import com.access.hub.contexts.organization.domain.entity.User;
 import com.access.hub.shared.application.dto.ResponseObject;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1/organization/user")
+@Tag(name = "Organization Context")
 public class UserController {
     private final CreateUserUseCase createUserUseCase;
 
