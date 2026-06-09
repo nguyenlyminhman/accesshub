@@ -2,14 +2,14 @@ package com.access.hub.contexts.project.infrastructure.persistence;
 
 import com.access.hub.contexts.project.domain.entity.Project;
 import com.access.hub.contexts.project.domain.repository.ProjectRepository;
-import com.access.hub.contexts.project.infrastructure.persistence.jpa.SpringDataProjectRepository;
+import com.access.hub.contexts.project.infrastructure.persistence.jpa.JpaProjectRepository;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ProjectRepositoryImpl implements ProjectRepository {
-    private final SpringDataProjectRepository projectRepository;
+    private final JpaProjectRepository projectRepository;
 
-    public ProjectRepositoryImpl(SpringDataProjectRepository projectRepository) {
+    public ProjectRepositoryImpl(JpaProjectRepository projectRepository) {
         this.projectRepository = projectRepository;
     }
 

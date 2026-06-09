@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface PersRepository {
     List<Permission> findAllOrderById();
+
+    List<String> findAllByIds(List<Integer> permissionIds);
 }

@@ -20,4 +20,9 @@ public class PersRepositoryImpl implements PersRepository{
     public List<Permission> findAllOrderById() {
         return jpaPersRepository.findAll(Sort.by("id"));
     }
+
+    @Override
+    public List<String> findAllByIds(List<Integer> permissionIds) {
+        return jpaPersRepository.findByIdIn(permissionIds);
+    }
 }
