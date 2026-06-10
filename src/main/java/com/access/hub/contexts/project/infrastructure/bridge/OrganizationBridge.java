@@ -1,4 +1,4 @@
-package com.access.hub.contexts.project.infrastructure.adapter;
+package com.access.hub.contexts.project.infrastructure.bridge;
 
 import com.access.hub.contexts.organization.application.port.OrganizationBridgeService;
 import com.access.hub.contexts.organization.domain.repository.PersRepository;

@@ -2,15 +2,15 @@ package com.access.hub.contexts.organization.infrastructure.persistence;
 
 import com.access.hub.contexts.organization.domain.entity.Department;
 import com.access.hub.contexts.organization.domain.repository.DepartmentRepository;
-import com.access.hub.contexts.organization.infrastructure.persistence.jpa.JpaDepartmentRepository;
+import com.access.hub.contexts.organization.infrastructure.persistence.dao.DepartmentDao;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DepartmentRepositoryImpl implements DepartmentRepository {
 
-    private final JpaDepartmentRepository departmentRepository;
+    private final DepartmentDao departmentRepository;
 
-    public DepartmentRepositoryImpl(JpaDepartmentRepository departmentRepository) {
+    public DepartmentRepositoryImpl(DepartmentDao departmentRepository) {
         this.departmentRepository = departmentRepository;
     }
 

@@ -21,7 +21,7 @@ public class UserController {
         this.createUserUseCase = createUserUseCase;
     }
 
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseObject createUser(@RequestBody CreateUserDto request) {
         ResponseObject responseObject = new ResponseObject();
 
