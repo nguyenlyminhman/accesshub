@@ -1,0 +1,18 @@
+package com.access.hub.contexts.project.application.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class MenuInfoProjection {
+    private int menuId;
+    private Integer parentId;
+    private String menuTitle;
+    private String menuUrl;
+    private int sortOrder;
+}
