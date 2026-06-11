@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/public/v1/auth")
+@RequestMapping("/api/v1/auth")
 @Tag(name = "Auth Context", description = "Các API phục vụ Stateless Authentication, JWT Issuance & Refresh Token")
 public class AuthController {
 
