@@ -12,8 +12,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserSharedDTO {
-    private String token;
-    private UserInfo userInfo;
-    private List<MenuSharedDTO> menuInfo;
+    private String username;
+    private String email;
+    private String deptCode;
+    private String deptName;
+    private String details;
+    private List<String> roles;
 }
 
