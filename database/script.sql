@@ -1,134 +1,175 @@
 -- =============================================================================
--- DỰ ÁN ACCESSHUB - SCRIPT TẠO DATABASE (POSTGRESQL DDL)
+-- DỰ ÁN ACCESSHUB - SCRIPT TẠO DATABASE (POSTGRESQL DDL) - REVISED
+-- Theo 3 bounded context đã chốt: Auth (token/session - quản lý riêng, KHÔNG
+-- có trong file này) / Organization / Project
 -- =============================================================================
 
--- Tách riêng bảng master permissions ra đầu để không bị lỗi thứ tự tạo bảng
--- Khởi tạo các bảng chính trước
+-- 0. Type dùng chung
+-- Bỏ 'DELETED' khỏi enum: soft-delete chỉ dùng cột deleted_at làm nguồn sự
+-- thật duy nhất, tránh 2 cờ xóa mềm lệch nhau (status vs deleted_at).
+CREATE TYPE status_type AS ENUM ('ACTIVE', 'INACTIVE');
 
--- 1. Bảng Phòng ban
+
+-- =============================================================================
+-- CONTEXT: ORGANIZATION (departments, users, group_roles)
+-- =============================================================================
+
+-- 1. Phòng ban
 CREATE TABLE departments (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     dept_code VARCHAR(100) UNIQUE NOT NULL,
     dept_name VARCHAR(255) NOT NULL,
     details TEXT,
-    status VARCHAR(50) DEFAULT 'ACTIVE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status status_type DEFAULT 'ACTIVE',
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     created_by VARCHAR(100),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(100),
-    deleted_at TIMESTAMP NULL
+    deleted_at TIMESTAMPTZ NULL
 );
 
--- 2. Bảng Nhân sự
+-- 2. Nhân sự (Users)
+-- departments & users cùng nằm trong Organization context (intra-context)
+-- nên dùng FK cứng để đảm bảo integrity, không cần liên kết yếu qua code nữa
+-- (liên kết yếu chỉ có ý nghĩa khi cắt ngang biên context, không phải trong context).
 CREATE TABLE users (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    dept_id INT REFERENCES departments(id),
+    dept_id INT REFERENCES departments(id) ON DELETE SET NULL,
     username VARCHAR(100) UNIQUE NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    status VARCHAR(50) DEFAULT 'ACTIVE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP NULL
+    status status_type DEFAULT 'ACTIVE',
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(100),
+    deleted_at TIMESTAMPTZ NULL
 );
 
--- 3. Bảng Dự án vệ tinh
+
+-- =============================================================================
+-- CONTEXT: PROJECT (projects, roles, menus, permissions + junction nội bộ)
+-- =============================================================================
+
+-- 3. Dự án vệ tinh
 CREATE TABLE projects (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    code VARCHAR(100) UNIQUE NOT NULL,
-    url VARCHAR(255) UNIQUE,
-    name VARCHAR(255) NOT NULL,
+    prj_code VARCHAR(100) UNIQUE NOT NULL,
+    prj_name VARCHAR(255) NOT NULL,
     details TEXT,
-    status VARCHAR(50) DEFAULT 'ACTIVE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status status_type DEFAULT 'ACTIVE',
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     created_by VARCHAR(100),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(100),
-    deleted_at TIMESTAMP NULL
+    deleted_at TIMESTAMPTZ NULL
 );
 
--- 4. Bảng Menu (Hỗ trợ cấu hình đa cấp self-reference)
+-- 4. Vai trò (Roles) - thuộc về 1 project cụ thể. 2 project có thể có role
+-- trùng tên (vd "ADMIN") mà vẫn là 2 entity độc lập. roles & projects cùng
+-- nằm trong Project context nên FK cứng + CASCADE là đúng (intra-context).
+CREATE TABLE roles (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    project_id INT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    role_code VARCHAR(50) NOT NULL,
+    details TEXT,
+    status status_type DEFAULT 'ACTIVE',
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_by VARCHAR(100),
+    deleted_at TIMESTAMPTZ NULL,
+    CONSTRAINT uq_project_role_code UNIQUE (project_id, role_code)
+);
+
+-- 5. Menu (hỗ trợ cấu hình đa cấp self-reference)
 CREATE TABLE menus (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    project_id INT REFERENCES projects(id) ON DELETE CASCADE,
-    parent_id INT REFERENCES menus(id) ON DELETE SET NULL,
+    project_id INT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    parent_id INT NULL REFERENCES menus(id) ON DELETE CASCADE,
+    ui_code VARCHAR(100) UNIQUE NOT NULL,
     url VARCHAR(255),
     title VARCHAR(255) NOT NULL,
     details TEXT,
     sort_order INT DEFAULT 0,
-    status VARCHAR(50) DEFAULT 'ACTIVE',
-    ui_code VARCHAR(50) GENERATED ALWAYS AS ('ui_' || id::text) STORED,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status status_type DEFAULT 'ACTIVE',
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     created_by VARCHAR(100),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(100),
-    deleted_at TIMESTAMP NULL
+    deleted_at TIMESTAMPTZ NULL
 );
 
--- 5. Bảng Vai trò (Roles)
-CREATE TABLE roles (
-    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    project_id INT REFERENCES projects(id) ON DELETE CASCADE,
-    role_code VARCHAR(100) NOT NULL,
-    details TEXT,
-    status VARCHAR(50) DEFAULT 'ACTIVE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_by VARCHAR(100),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_by VARCHAR(100),
-    deleted_at TIMESTAMP NULL,
-    -- Tránh trùng lặp mã role trong cùng một dự án
-    CONSTRAINT unique_project_role UNIQUE (project_id, role_code)
-);
-
--- 6. Bảng Hành động Master (Permissions)
+-- 6. Hành động Master (Permissions) - dữ liệu tham chiếu dùng chung,
+-- không scope theo project (CREATE/READ/UPDATE/DELETE... áp dụng mọi nơi).
 CREATE TABLE permissions (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    code VARCHAR(100) UNIQUE NOT NULL, -- VD: CREATE, READ, UPDATE, DELETE, EXPORT...
+    pers_code VARCHAR(50) UNIQUE NOT NULL,
     details TEXT,
-    status VARCHAR(50) DEFAULT 'ACTIVE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status status_type DEFAULT 'ACTIVE',
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     created_by VARCHAR(100),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_by VARCHAR(100),
-    deleted_at TIMESTAMP NULL
+    deleted_at TIMESTAMPTZ NULL
 );
 
-
--- =============================================================================
--- CÁC BẢNG TRUNG GIAN (JUNCTION TABLES) VỚI KHÓA CHÍNH TỔ HỢP
--- =============================================================================
-
--- 7. Bảng nối tương tác Nhiều - Nhiều giữa Người dùng và Vai trò
-CREATE TABLE group_roles (
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    role_id INT REFERENCES roles(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id, role_id)
-);
-
--- 8. Ý định 1: Định nghĩa Menu này chứa các hành động hợp lệ nào
+-- 7. Menu chứa các hành động hợp lệ nào (junction nội bộ Project context,
+-- FK cứng OK vì 2 bảng đều thuộc Project).
 CREATE TABLE menu_permissions (
     menu_id INT REFERENCES menus(id) ON DELETE CASCADE,
     permission_id INT REFERENCES permissions(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
     PRIMARY KEY (menu_id, permission_id)
 );
 
--- 9. Ý định 2: Phân quyền thực tế cho Role trên từng Menu (Bật/Tắt từ danh sách trên)
+-- 8. Phân quyền thực tế cho Role trên từng Menu (junction nội bộ Project,
+-- FK cứng OK vì roles/menus/permissions đều thuộc Project context).
 CREATE TABLE role_menu_permissions (
     role_id INT REFERENCES roles(id) ON DELETE CASCADE,
-    menu_id INT NOT NULL,
-    permission_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (role_id, menu_id, permission_id),
+    menu_id INT REFERENCES menus(id) ON DELETE CASCADE,
+    permission_id INT REFERENCES permissions(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
+    PRIMARY KEY (role_id, menu_id, permission_id)
 );
 
 
 -- =============================================================================
--- TẠO CÁC INDEX BỔ TRỢ ĐỂ TỐI ƯU TỐC ĐỘ TRUY VẤN BIỆT LẬP (SOFT DELETE)
+-- JUNCTION XUYÊN BIÊN CONTEXT: ORGANIZATION <-> PROJECT
+-- role_id KHÔNG FK cứng tới roles, vì roles thuộc Project context còn
+-- group_roles thuộc Organization context. Đánh đổi: mất CASCADE tự động khi
+-- role bị xóa ở Project context -> cần job dọn rác định kỳ hoặc event/callback
+-- từ Project context sang Organization context khi 1 role bị xóa/deactivate.
 -- =============================================================================
--- Giúp Postgres lọc cực nhanh những bản ghi chưa bị xóa mềm (deleted_at IS NULL)
+
+-- 9. Gán Role cho User
+CREATE TABLE group_roles (
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    role_id INT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
+    PRIMARY KEY (user_id, role_id)
+);
+
+
+-- =============================================================================
+-- INDEX BỔ TRỢ
+-- =============================================================================
+
+-- Lookup user khi login/check quyền
 CREATE INDEX idx_users_active_lookup ON users(username) WHERE deleted_at IS NULL;
-CREATE INDEX idx_projects_code_lookup ON projects(code) WHERE deleted_at IS NULL;
+
+-- Lookup project theo code
+CREATE INDEX idx_projects_code_lookup ON projects(prj_code) WHERE deleted_at IS NULL;
+
+-- Lookup menu theo project
 CREATE INDEX idx_menus_project_lookup ON menus(project_id) WHERE deleted_at IS NULL;
+
+-- Tối ưu truy vấn đệ quy cây menu (CTE Recursive)
+CREATE INDEX idx_menus_parent ON menus(parent_id) WHERE deleted_at IS NULL;
+
+-- role_id ở group_roles không còn FK cứng -> cần index riêng để lookup nhanh
+-- "user nào đang giữ role X", và hỗ trợ job dọn rác khi role bị xóa ở Project context.
+CREATE INDEX idx_group_roles_role_id ON group_roles(role_id);
