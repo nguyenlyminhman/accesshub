@@ -16,6 +16,7 @@ public class MenuInfoProjection {
     private Integer parentId;
     private String menuTitle;
     private String menuUrl;
+    private String uiCode;
     private int sortOrder;
     private String permissions;
 }

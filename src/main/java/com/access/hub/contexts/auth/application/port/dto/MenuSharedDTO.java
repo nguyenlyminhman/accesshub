@@ -12,10 +12,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MenuSharedDTO {
-    private int menuId;
+    private int id;
     private Integer parentId;
-    private String menuTitle;
-    private String menuUrl;
+    private String title;
+    private String url;
+    private String uiCode;
     private int sortOrder;
     private String permissions;
 }

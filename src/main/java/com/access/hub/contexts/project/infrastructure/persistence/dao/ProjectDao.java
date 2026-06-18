@@ -19,6 +19,7 @@ public interface ProjectDao extends JpaRepository<Project, Integer> {
                     m.parent_id AS parentId,
                     m.title AS menuTitle,
                     m.url AS menuUrl,
+                    m.ui_code AS uiCode,
                     m.sort_order AS sortOrder,
                     JSON_AGG(DISTINCT p.pers_code) AS permissions
                 FROM users u
