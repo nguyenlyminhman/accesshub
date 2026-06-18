@@ -87,7 +87,7 @@ CREATE TABLE menus (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     project_id INT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     parent_id INT NULL REFERENCES menus(id) ON DELETE CASCADE,
-    ui_code VARCHAR(50) GENERATED ALWAYS AS ('ui_' || id::text) STORED,
+    ui_code VARCHAR(50) UNIQUE NOT NULL,
     url VARCHAR(255),
     title VARCHAR(255) NOT NULL,
     details TEXT,
