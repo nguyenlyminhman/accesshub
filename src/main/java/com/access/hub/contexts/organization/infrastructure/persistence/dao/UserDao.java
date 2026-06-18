@@ -28,17 +28,21 @@ public interface UserDao extends JpaRepository<User, Integer> {
     UserInfoProjection getUserDepartmentDetails(String username);
 
     @Query(value = """
-        SELECT DISTINCT r.role_code AS roleCode
-        FROM users u
-        JOIN group_roles gr ON u.id = gr.user_id
-        JOIN roles r ON gr.role_id = r.id
-        JOIN projects pr ON r.project_id = pr.id
-        WHERE u.username = :username
-          AND pr.code = :projectCode
-          AND u.deleted_at IS NULL
-          AND r.deleted_at IS NULL
-          AND pr.deleted_at IS NULL
-        ORDER BY r.role_code ASC
+        SELECT DISTINCT
+                    r.role_code AS roleCode
+                FROM users u
+                JOIN group_roles gr ON u.id = gr.user_id
+                JOIN roles r ON gr.role_id = r.id
+                JOIN projects pr ON r.project_id = pr.id
+                WHERE u.username = :username
+                  AND pr.prj_code = :projectCode
+                  AND u.deleted_at IS NULL
+                  AND r.deleted_at IS NULL
+                  AND pr.deleted_at IS NULL
+                  AND u.status = 'ACTIVE'
+                  AND r.status = 'ACTIVE'
+                  AND pr.status = 'ACTIVE'
+                ORDER BY r.role_code ASC
     """, nativeQuery = true)
     List<String> findRolesByUsernameAndProjectCode(@Param("username") String username, @Param("projectCode") String projectCode);
 }

@@ -13,5 +13,4 @@ public class CreateDepartmentDto {
     private String deptCode;
     private String deptName;
     private String details;
-    private String status;
 }

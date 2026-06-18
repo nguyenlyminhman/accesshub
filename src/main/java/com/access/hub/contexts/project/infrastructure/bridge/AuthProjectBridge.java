@@ -26,7 +26,8 @@ public class AuthProjectBridge implements AuthProjectService {
                     e.getParentId(),
                     e.getMenuTitle(),
                     e.getMenuUrl(),
-                    e.getSortOrder()
+                    e.getSortOrder(),
+                    e.getPermissions()
             )).toList();
 
         return sharedDTOList;

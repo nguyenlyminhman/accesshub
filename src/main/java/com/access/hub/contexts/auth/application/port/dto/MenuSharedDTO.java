@@ -17,4 +17,5 @@ public class MenuSharedDTO {
     private String menuTitle;
     private String menuUrl;
     private int sortOrder;
+    private String permissions;
 }

@@ -4,6 +4,7 @@ import com.access.hub.contexts.organization.application.port.OrganizationBridgeS
 import com.access.hub.contexts.project.application.dto.CreateMenuDto;
 import com.access.hub.contexts.project.domain.entity.Menu;
 import com.access.hub.contexts.project.domain.repository.MenuRepository;
+import com.access.hub.shared.Status;
 import com.access.hub.shared.domain.exception.BusinessRuleViolationException;
 import com.access.hub.shared.domain.exception.DomainException;
 import org.springframework.stereotype.Service;
@@ -43,9 +44,13 @@ public class CreateMenuUseCase {
             menu.setProjectId(request.getProjectId());
             menu.setParentId(request.getParentId());
             menu.setSortOrder(request.getSortOrder());
+            menu.setStatus(Status.ACTIVE);
             menu.markAsCreated(currentUserId);
 
-            return menuRepository.save(menu);
+            Menu saved = menuRepository.save(menu);
+            menu.setUiCode("ui_" + saved.getId());
+
+            return menuRepository.save(saved);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);

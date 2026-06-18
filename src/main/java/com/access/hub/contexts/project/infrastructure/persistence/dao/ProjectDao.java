@@ -14,25 +14,34 @@ public interface ProjectDao extends JpaRepository<Project, Integer> {
     boolean existsByPrjCode(String code);
 
     @Query(value = """
-        SELECT DISTINCT 
-            m.id AS menuId, 
-            m.parent_id AS parentId,  
-            m.title AS menuTitle, 
-            m.url AS menuUrl, 
-            m.sort_order AS sortOrder
-        FROM users u
-        JOIN group_roles gr ON u.id = gr.user_id
-        JOIN roles r ON gr.role_id = r.id
-        JOIN projects p ON r.project_id = p.id
-        JOIN role_menu_permissions rmp ON r.id = rmp.role_id
-        JOIN menus m ON rmp.menu_id = m.id AND m.project_id = p.id
-        WHERE u.username = :username 
-          AND p.code = :projectCode
-          AND u.deleted_at IS NULL
-          AND r.deleted_at IS NULL
-          AND p.deleted_at IS NULL
-          AND m.deleted_at IS NULL
-        ORDER BY m.parent_id ASC, m.sort_order ASC
+        SELECT
+                    m.id AS menuId,
+                    m.parent_id AS parentId,
+                    m.title AS menuTitle,
+                    m.url AS menuUrl,
+                    m.sort_order AS sortOrder,
+                    JSON_AGG(DISTINCT p.pers_code) AS permissions
+                FROM users u
+                JOIN group_roles gr ON u.id = gr.user_id
+                JOIN roles r ON gr.role_id = r.id
+                JOIN role_menu_permissions rmp ON r.id = rmp.role_id
+                JOIN menus m ON rmp.menu_id = m.id
+                JOIN projects pr ON m.project_id = pr.id
+                JOIN permissions p ON rmp.permission_id = p.id
+                WHERE u.username = :username
+                  AND pr.prj_code = :projectCode
+                  AND u.deleted_at IS NULL
+                  AND r.deleted_at IS NULL
+                  AND m.deleted_at IS NULL
+                  AND pr.deleted_at IS NULL
+                  AND p.deleted_at IS null
+                  AND u.status = 'ACTIVE'
+                  AND r.status = 'ACTIVE'
+                  AND m.status = 'ACTIVE'
+                  AND pr.status = 'ACTIVE'
+                  AND p.status = 'ACTIVE'
+                GROUP BY m.id, m.parent_id, m.title, m.url, m.sort_order
+                ORDER BY m.parent_id ASC NULLS FIRST, m.sort_order ASC
     """, nativeQuery = true)
     List<MenuInfoProjection> findRawMenusByUsernameAndProject(@Param("username") String username, @Param("projectCode") String projectCode);
 }
