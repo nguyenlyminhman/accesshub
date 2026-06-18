@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ProjectRepository {
     Project save(Project project);
-    boolean existsByCode(String code);
+    boolean existsByPrjCode(String code);
 
     List<MenuInfoProjection> findRawMenusByUsernameAndProject(String username, String projectCode);
 }

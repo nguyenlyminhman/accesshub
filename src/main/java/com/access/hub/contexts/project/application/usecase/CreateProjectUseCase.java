@@ -18,7 +18,7 @@ public class CreateProjectUseCase {
 
     public Project execute(CreateProjectDto request, String currentUserId) {
 
-        if (projectRepository.existsByCode(request.getCode())) {
+        if (projectRepository.existsByPrjCode(request.getCode())) {
             throw new DomainException("Project code '" + request.getCode() + "' already exists!");
         }
 
