@@ -103,7 +103,7 @@ CREATE TABLE menus (
 -- 6. Hành động Master (Permissions) - dữ liệu tham chiếu dùng chung,
 -- không scope theo project (CREATE/READ/UPDATE/DELETE... áp dụng mọi nơi).
 CREATE TABLE permissions (
-    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id INT PRIMARY KEY,
     pers_code VARCHAR(50) UNIQUE NOT NULL,
     details TEXT,
     status status_type DEFAULT 'ACTIVE',
@@ -173,3 +173,36 @@ CREATE INDEX idx_menus_parent ON menus(parent_id) WHERE deleted_at IS NULL;
 -- role_id ở group_roles không còn FK cứng -> cần index riêng để lookup nhanh
 -- "user nào đang giữ role X", và hỗ trợ job dọn rác khi role bị xóa ở Project context.
 CREATE INDEX idx_group_roles_role_id ON group_roles(role_id);
+
+
+INSERT INTO permissions
+(
+    id,
+    pers_code,
+    details,
+    status,
+    created_at,
+    created_by,
+    updated_at,
+    updated_by,
+    deleted_at
+)
+VALUES
+(1,  'VIEW',             'View',             'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(2,  'CREATE',           'Create',           'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(3,  'UPDATE',           'Update',           'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(4,  'DELETE',           'Delete',           'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(5,  'GRANT_PERMISSION', 'Grant permission', 'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(6,  'EXPORT',           'Export',           'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(7,  'IMPORT',           'Import',           'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(8,  'CANCEL',           'Cancel',           'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(9,  'APPROVE',          'Approve',          'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(10, 'REJECT',           'Reject',           'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(11, 'REVERT',           'Revert',           'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(12, 'ASSIGN',           'Assign',           'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(13, 'ANALYZE',          'Analyze',          'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(14, 'DOWNLOAD',         'Download',         'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(15, 'PROCESS',          'Process',          'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(16, 'RESOLVE',          'Resolve',          'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(17, 'CLOSE',            'Close',            'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL),
+(18, 'UPLOAD',           'Upload',           'ACTIVE', CURRENT_TIMESTAMP, 'SYSTEM', CURRENT_TIMESTAMP, 'SYSTEM', NULL);
