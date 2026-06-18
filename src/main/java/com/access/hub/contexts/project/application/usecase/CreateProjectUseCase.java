@@ -3,6 +3,7 @@ package com.access.hub.contexts.project.application.usecase;
 import com.access.hub.contexts.project.application.dto.CreateProjectDto;
 import com.access.hub.contexts.project.domain.entity.Project;
 import com.access.hub.contexts.project.domain.repository.ProjectRepository;
+import com.access.hub.shared.Status;
 import com.access.hub.shared.domain.exception.DomainException;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +23,10 @@ public class CreateProjectUseCase {
         }
 
         Project project = new Project();
-        project.setCode(request.getCode());
-        project.setUrl(request.getUrl());
-        project.setName(request.getName());
+        project.setPrjCode(request.getCode());
+        project.setPrjName(request.getName());
         project.setDetails(request.getDetails());
-        project.setStatus("ACTIVE");
+        project.setStatus(Status.ACTIVE);
         project.markAsCreated(currentUserId);
 
         return projectRepository.save(project);

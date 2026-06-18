@@ -15,6 +15,6 @@ public class ProjectExternalAdapter implements ProjectService {
 
     @Override
     public boolean isProjectActive(String projectCode) {
-        return projectRepository.existsByCode(projectCode);
+        return projectRepository.existsByPrjCode(projectCode);
     }
 }

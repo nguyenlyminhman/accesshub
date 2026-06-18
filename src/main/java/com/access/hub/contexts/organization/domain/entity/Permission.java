@@ -1,5 +1,6 @@
 package com.access.hub.contexts.organization.domain.entity;
 
+import com.access.hub.shared.Status;
 import com.access.hub.shared.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,5 +23,7 @@ public class Permission extends BaseEntity {
 
     private String details;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private Status status;
 }

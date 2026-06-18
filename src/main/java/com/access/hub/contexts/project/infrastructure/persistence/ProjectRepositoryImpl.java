@@ -23,7 +23,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
 
     @Override
     public boolean existsByCode(String code) {
-        return projectDao.existsByCode(code);
+        return projectDao.existsByPrjCode(code);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.access.hub.contexts.organization.application.usecase;
 import com.access.hub.contexts.organization.application.dto.CreateUserDto;
 import com.access.hub.contexts.organization.domain.entity.User;
 import com.access.hub.contexts.organization.domain.repository.UserRepository;
+import com.access.hub.shared.Status;
 import com.access.hub.shared.domain.exception.DomainException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class CreateUserUseCase {
             user.setEmail(dto.getEmail());
             user.setUsername(dto.getUsername());
             user.setPassword(passwordHash);
-            user.setStatus("ACTIVE");
+            user.setStatus(Status.ACTIVE);
             user.markAsCreated(username);
 
             userRepository.save(user);

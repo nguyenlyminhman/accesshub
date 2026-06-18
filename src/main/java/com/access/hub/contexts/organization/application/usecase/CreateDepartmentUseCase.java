@@ -3,6 +3,7 @@ package com.access.hub.contexts.organization.application.usecase;
 import com.access.hub.contexts.organization.application.dto.CreateDepartmentDto;
 import com.access.hub.contexts.organization.domain.entity.Department;
 import com.access.hub.contexts.organization.domain.repository.DepartmentRepository;
+import com.access.hub.shared.Status;
 import com.access.hub.shared.domain.exception.DomainException;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class CreateDepartmentUseCase {
         department.setDeptCode(request.getDeptCode());
         department.setDeptName(request.getDeptName());
         department.setDetails(request.getDetails());
-        department.setStatus("ACTIVE");
+        department.setStatus(Status.ACTIVE);
         department.markAsCreated(mockCurrentUserId);
 
         return  departmentRepository.save(department);

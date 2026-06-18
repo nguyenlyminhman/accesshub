@@ -1,5 +1,6 @@
 package com.access.hub.contexts.project.domain.entity;
 
+import com.access.hub.shared.Status;
 import com.access.hub.shared.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,9 +19,16 @@ public class Project extends BaseEntity {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String code;
-    private String url;
-    private String name;
+
+    @Column(name = "prj_code")
+    private String prjCode;
+
+    @Column(name = "prj_name")
+    private String prjName;
+
     private String details;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private Status status;
 }

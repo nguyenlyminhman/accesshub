@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface ProjectDao extends JpaRepository<Project, Integer> {
-    boolean existsByCode(String code);
+    boolean existsByPrjCode(String code);
 
     @Query(value = """
         SELECT DISTINCT 

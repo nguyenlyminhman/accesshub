@@ -1,5 +1,6 @@
 package com.access.hub.contexts.project.domain.entity;
 
+import com.access.hub.shared.Status;
 import com.access.hub.shared.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,9 +26,16 @@ public class Menu extends BaseEntity {
     @Column(name = "parent_id")
     private Integer parentId;
 
+    @Column(name = "ui_code")
+    private String uiCode;
+
     private String url;
     private String title;
     private String details;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private Status status;
 
     @Column(name = "sort_order")
     private int sortOrder;

@@ -13,10 +13,12 @@ import java.util.List;
 @NoArgsConstructor
 public class MenuInfo {
     private int menuId;
-    private Integer parentId;
+    private String parentId;
     private String menuTitle;
     private String menuUrl;
     private int sortOrder;
+    private String uiCode;
     private List<String> permissions;
     private MenuInfo children;
+
 }
