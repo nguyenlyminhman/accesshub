@@ -2,14 +2,13 @@ package com.access.hub.contexts.organization.presentation;
 
 import com.access.hub.contexts.organization.application.dto.CreateDepartmentDto;
 import com.access.hub.contexts.organization.application.usecase.CreateDepartmentUseCase;
+import com.access.hub.contexts.organization.application.usecase.GetDepartmentUseCase;
 import com.access.hub.contexts.organization.domain.entity.Department;
-import com.access.hub.contexts.project.domain.entity.Project;
 import com.access.hub.shared.application.dto.ResponseObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/organization/department")
@@ -17,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class DepartmentController {
 
     private final CreateDepartmentUseCase createDepartmentUseCase;
+    private final GetDepartmentUseCase getDepartmentUseCase;
 
-    public DepartmentController(CreateDepartmentUseCase createDepartmentUseCase) {
+    public DepartmentController(CreateDepartmentUseCase createDepartmentUseCase, GetDepartmentUseCase getDepartmentUseCase) {
         this.createDepartmentUseCase = createDepartmentUseCase;
+        this.getDepartmentUseCase = getDepartmentUseCase;
     }
 
     @PostMapping()
@@ -37,4 +38,17 @@ public class DepartmentController {
         return responseObject;
     }
 
+    @GetMapping()
+    public ResponseObject getAllDept() {
+        ResponseObject responseObject = new ResponseObject();
+
+        List<Department> rs = getDepartmentUseCase.execute();
+
+        responseObject.setSuccess(true);
+        responseObject.setCode(200);
+        responseObject.setMessage("Success");
+        responseObject.setData(rs);
+
+        return responseObject;
+    }
 }

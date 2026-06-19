@@ -5,6 +5,8 @@ import com.access.hub.contexts.organization.domain.repository.DepartmentReposito
 import com.access.hub.contexts.organization.infrastructure.persistence.dao.DepartmentDao;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class DepartmentRepositoryImpl implements DepartmentRepository {
 
@@ -22,5 +24,10 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
     @Override
     public boolean existsByDeptCode(String code) {
         return this.departmentRepository.existsByDeptCode(code);
+    }
+
+    @Override
+    public List<Department> getAllDepartment() {
+        return this.departmentRepository.findAll();
     }
 }
